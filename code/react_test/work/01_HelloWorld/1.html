@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app"></div>
+<script src="../js/react.development.js"></script>
+<script src="../js/react-dom.development.js"></script>
+<script src="../js/babel.min.js"></script>
+<script type="text/babel">
+    // 创建虚拟dom元素对象
+    var vDom=<h1>hello React</h1>
+    // 将虚拟dom渲染到页面真实dom容器中
+    ReactDOM.render(vDom,document.getElementById('app'))
+</script>
+</body>
+</html>

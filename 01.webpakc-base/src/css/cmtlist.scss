@@ -1,0 +1,21 @@
+/*被:local（）包裹起来的类名 不会被模块化*/
+.title{
+    color: red;
+    text-align: center;
+    font-weight: 200;
+}
+
+/*css模块化 只针对 类选择器 和 id选择器生效*/
+/*css不会将标签选择器模块化*/
+h2{
+    font-style: italic;
+}
+
+#cmtTitle {
+    font-size: 12px;
+}
+
+/*被:global()包裹起来的类名 不会被模块化 会全局生效*/
+:global(.test){
+    font-style: italic;
+}

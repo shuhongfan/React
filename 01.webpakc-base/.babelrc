@@ -1,0 +1,6 @@
+{
+//  语法包
+  "presets": ["env","stage-0","react"],
+//  插件包
+  "plugins": ["transform-runtime"]
+}

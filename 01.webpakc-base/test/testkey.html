@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <div>
+        <input type="text" v-model="uname">
+        <button @click="add">添加</button>
+    </div>
+    <ul>
+        <li v-for="item in list" :key="item.id">
+            <input type="checkbox">
+            {{item.id}}----{{item.name}}
+        </li>
+    </ul>
+</div>
+<script>
+    const vm=new Vue({
+        // el:'#app',
+        data:{
+            list:[
+                {id:0,name:'嬴政'},
+                {id:1,name:'卢布韦'},
+                {id:2,name:'嬴政1'}
+            ],
+            uname:''
+        },
+        methods: {
+            add(){
+                console.log('add方法触发')
+                var newuser={id:this.list.length,name:this.uname}
+                this.list.unshift(newuser)
+            }
+        },
+        // 第一个生命周期函数
+        // 此时组件的data和methods以及页面dom结构都还没有初始化 什么都做不了
+        beforeCreate(){
+            // console.log(this.list)
+            // this.add()
+            // console.log(this.$el)
+        },
+        // 第二个生命周期函数
+        // 此时组件的 data和methods已经可用了 但是dom结构还没有初始化
+        // 此时要发送ajax请求
+        created(){
+            // console.log(this.list)
+            // this.add()
+            // console.log(this.$el)
+        },
+        // 三个生命周期函数
+        // 此时内存中的模板结构还没有真正渲染到页面上 此时页面上看不到真实数据 只是模板页面
+        beforeMount(){
+            // console.log(this.list)
+            // this.add()
+            // console.log(this.$el)
+        },
+        // 第四个生命周期函数 组件创建阶段最后一个生命周期函数
+        // 此时 把内存中渲染好的模板结构 替换到页面上 用户已经可以看到真实的页面数据了
+        // 用到的第三方UI插件 而且这个插件还需要被初始化 那么必须在mounted中来初始化插件
+        mounted(){
+            console.log(this.list)
+            this.add()
+            console.log(this.$el)
+        },
+        // 第五个生命周期函数 组件运行中的生命周期函数
+        // 此时 数据是最新的 但 页面上的数据还是旧的
+
+        // 当data数据变化 页面更新的3步
+        // 1.拿到最新的data数据
+        // 2.根据最新的data数据 在内存中 重新渲染一颗新的dom树
+        // 3.把旧的页面移出 同时 把新的dom树 渲染出来
+        beforeUpdate(){
+
+        },
+        // 第六个生命周期函数 组件运行中的生命周期函数
+        // 此时 页面已经完成了更新 data数据是最新的 同时页面上呈现的数据也是最新的
+        updated(){
+
+        },
+        // 第七个生命周期函数 组件销毁的阶段
+        // 此时 组件即将被销毁 组件还是正常可用的 data、methods等数据方法依然可以被正常访问
+        beforeDestory(){
+
+        },
+        // 第八个生命周期函数 组件销毁的阶段
+        // 此时组件已经完全销毁 data和methods都无法使用
+        destroyed(){
+
+        }
+    })
+    // 手动挂载el
+    vm.$mount('#app')
+</script>
+</body>
+</html>
+
