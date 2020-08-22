@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const md5=require('blueimp-md5')
-const {UserModel}=require('../db/modules')
+const {UserModel,ChatModel}=require('../db/modules')
 const filter={password:0,__v:0} // 查询时过滤出指定属性
 
 /* GET home page. */
@@ -79,6 +79,92 @@ router.post('/login',function (req,res) {
         msg:'用户名或密码不正确'
       })
     }
+  })
+})
+
+// 更新用户信息的路由
+router.post('/update',function (req,res) {
+  // 从请求的cookie中得到userid
+  const userid=req.cookies.userid
+  // 判断用户是否存在
+  if (!userid){
+    return res.send({code:1,msg:'请先登录'})
+  }
+  // 得到提交的用户数据
+  const user=req.body
+  UserModel.findByIdAndUpdate({_id:userid},user,function (error,oldUser) {
+    if (!oldUser){
+      // 通知浏览器删除cookie
+      res.clearCookie('userid')
+      return res.send({code:1,msg:'请先登录'})
+    } else {
+      // 准备返回一个user对象
+      const {_id,username,type}=oldUser
+      const data=Object.assign(user,{_id,username,type})
+      return res.send({code:0,data})
+    }
+  })
+})
+
+// 获取用户信息的路由 根据cookie中的userid
+router.get('/user', function (req, res) {
+  // 从请求的cookie得到userid
+  const userid = req.cookies.userid
+  // 如果不存在, 直接返回一个提示信息
+  if(!userid) {
+    return res.send({code: 1, msg: '请先登陆'})
+  }
+  // 根据userid查询对应的user
+  UserModel.findOne({_id: userid}, filter, function (error, user) {
+    if(user) {
+      res.send({code: 0, data: user})
+    } else {
+      // 通知浏览器删除userid cookie
+      res.clearCookie('userid')
+      res.send({code: 1, msg: '请先登陆'})
+    }
+
+  })
+})
+
+// 获取用户列表 根据类型
+router.get('/userlist',function (req,res) {
+  const {type}=req.query
+  UserModel.find({type},filter,function (error,users) {
+    res.send({code:0,data:users})
+  })
+})
+
+// 获取当前用户所有相关聊天信息列表
+router.get('/msglist',function (req,res) {
+  // 获取cookie中的userid
+  const userid=req.cookies.userid
+  UserModel.find(function (err,userDocs) {
+    // const users={}
+    // userDocs.forEach(doc=>{
+    //   users[doc._id]={username:doc.username,header:doc.header}
+    // })
+    const users=userDocs.reduce((users,user)=>{
+      users[user._id]={username:user.username,header:user.header}
+      return users
+    },{})
+    // 查询userid相关的所有聊天信息
+    ChatModel.find({'$or':[{from:userid},{to:userid}]},filter,function (err,chatMsgs) {
+      res.send({code:0,data:{users,chatMsgs}})
+    })
+  })
+})
+
+// 修改指定消息为已读
+router.post('/readmsg',function (req,res) {
+  // 得到请求中的from和to
+  const {from}=req.body
+  const to=req.cookies.userid
+  // 更新数据库中的chat数据
+  // multi一次性更新多条数据
+  ChatModel.update({from,to,read:false},{read:true},{multi:true},function (err,doc) {
+    console.log('/readmsg',doc)
+    res.send({code:0,data:doc.nModified}) // 更新数量
   })
 })
 
