@@ -1,13 +1,9 @@
-import React from "react";
+import React from 'react'
 import ReactDOM from 'react-dom'
-import {Provider} from 'react-redux'
 
-import store from './redux/store'
-import App from "./containers/app/app";
+import TestComponents from "./components/TestComponents";
+// import Index from "./components/parent&child";
+// import Index from "./components/brothers";
+import Index from "./components/router";
 
-ReactDOM.render((
-    <Provider store={store}>
-        <App></App>
-    </Provider>
-),document.getElementById('root'))
-
+ReactDOM.render(<Index/>, document.getElementById('root'))
