@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>舒洪凡、彭义龙</title>
+		<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+		<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+		<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+		<style type="text/css">
+			body{
+				font: 14px "century gothic",futura,sans-serif;
+				margin: 20px;
+			}
+			ol,ul{
+				padding-left: 30px;
+			}
+			.board-row:after{
+				clear: both;
+				content: "";
+				display: table;
+			}
+			.status{
+				margin-bottom: 10px;
+			}
+			.square{
+				background: #fff;
+				border: 1px solid #999;
+				float: left;
+				font-size: 24px;
+				font-weight: bold;
+				line-height: 34px;
+				height: 34px;
+				margin-left: -1px;
+				margin-top: -1px;
+				padding: 0;
+				text-align: center;
+				width: 34px;
+			}
+			.square:focus{
+				outline: none;
+			}
+			.kbd-navigation .square:focus{
+				background: #ddd;
+			}
+			.game{
+				display: flex;
+				flex-direction: row;
+			}
+			.game-info{
+				margin-left: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="text/babel">
+			// 格子函数组件
+			function Square(props) {
+			  return (React.createElement("button", { className: "square", onClick: props.onClick },props.value));
+			}
+			// 判断胜负
+			function calculateWinner(squares) {
+				const lines = [[0, 1, 2],[3, 4, 5],[6, 7, 8],[0, 3, 6],[1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+				for (let i = 0; i < lines.length; i++) {
+					const [a, b, c] = lines[i];
+					if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+						return squares[a];
+					}
+				}
+				return null;
+			}
+			// 棋盘组件
+			class Board extends React.Component {
+			  renderSquare(i) {
+			    return (React.createElement(Square, {value: this.props.squares[i],onClick: () => this.props.onClick(i) }));
+			  }
+			  render() {
+			    return (
+			      React.createElement("div", null,
+			      React.createElement("div", { className: "board-row" },this.renderSquare(0),this.renderSquare(1),this.renderSquare(2)),
+			      React.createElement("div", { className: "board-row" },this.renderSquare(3),this.renderSquare(4),this.renderSquare(5)),
+			      React.createElement("div", { className: "board-row" },this.renderSquare(6),this.renderSquare(7),this.renderSquare(8))));
+			  }}
+			// 游戏组件
+			class Game extends React.Component {
+			  constructor(props) {
+			    super(props);
+			    this.state = {
+			      history: [{squares: Array(9).fill(null) }], stepNumber: 0, xIsNext: true };
+			  }
+			// 单击落子
+			  handleClick(i) {
+			    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+			    const current = history[history.length - 1];
+			    const squares = current.squares.slice();
+			    if (calculateWinner(squares) || squares[i]) {return;}
+			    squares[i] = this.state.xIsNext ? "X" : "O";
+			    this.setState({
+			      history: history.concat([{squares: squares }]),stepNumber: history.length,xIsNext: !this.state.xIsNext });
+			  }
+			// 历史记录跳转
+			  jumpTo(step) {
+			    this.setState({stepNumber: step,xIsNext: step % 2 === 0 });
+			  }
+			
+			  render() {
+			  	// 历史记录
+			    const history = this.state.history;
+			    const current = history[this.state.stepNumber];
+			    const winner = calculateWinner(current.squares);
+			    const moves = history.map((step, move) => { const desc = move ?'Go to move #' + move :'Go to game start';
+			      return (
+			        React.createElement("li", { key: move },
+							React.createElement("button", { onClick: () => this.jumpTo(move) }, desc)));
+			    });
+			
+			    let status;
+			    if (winner) {
+			      status = "Winner: " + winner;
+			    } else {
+			      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+			    }
+			    return (
+			      React.createElement("div", { className: "game" },
+			      React.createElement("div", { className: "game-board" },
+			      React.createElement(Board, {squares: current.squares,onClick: i => this.handleClick(i) })),
+			      React.createElement("div", { className: "game-info" },
+			      React.createElement("div", null, status),
+			      React.createElement("ol", null, moves))));
+			  }}
+
+			// 渲染到dom元素上
+			ReactDOM.render(React.createElement(Game, null), document.getElementById("root"));
+
+		</script>
+	</body>
+</html>
