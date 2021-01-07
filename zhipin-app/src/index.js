@@ -10,6 +10,8 @@ import Login from "./containers/login/login";
 import Main from "./containers/main/main";
 import store from "./redux/store";
 
+// import './test/socketio_test2'
+
 ReactDOM.render((
     <Provider store={store}>
         <HashRouter>
